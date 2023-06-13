@@ -1,14 +1,17 @@
-from datetime import datetime
 from typing import Any, Dict, Optional
 from omegaconf import OmegaConf
+from datetime import datetime
 from pathlib import Path
 import pandas as pd
+import coloredlogs
 import requests
 import logging
 import json
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger("dana-client")
+
+coloredlogs.install(level="INFO", logger=LOGGER)
 
 
 def add_new_optimum_build(
@@ -158,12 +161,12 @@ def main():
     DASHBOARD_URL = "http://localhost:7000"
 
     # The bearer token to use for authentication
-    BEARER_TOKEN = open("token.txt").read().strip()
+    BEARER_TOKEN = "secret"  # open("token.txt").read().strip()
 
     # set to tru to ovverride existing series
     OVERRIDE = True
 
-    DRY_RUN = False
+    DRY_RUN = True
     VERBOSE = False
 
     for project_folder in Path("dana").iterdir():
@@ -201,7 +204,6 @@ def main():
                 add_new_optimum_build(
                     project_id=project_id,
                     build_id=build_id,
-                    series_id=series_id,
                     dashboard_url=DASHBOARD_URL,
                     bearer_token=BEARER_TOKEN,
                     override=OVERRIDE,
@@ -215,7 +217,7 @@ def main():
                 ).to_dict("records")[0]
 
                 # convert to ms (what dana expects)
-                sample_value = inference_results["Model latency mean (s)"] * 1000
+                sample_value = inference_results["forward.latency(s)"] * 1000
 
                 # a sample is a measurement of a series at a given build
                 LOGGER.info(f"\t\t + Adding new sample...")
