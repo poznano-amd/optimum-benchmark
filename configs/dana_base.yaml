@@ -1,0 +1,12 @@
+defaults:
+  - hydra_base # inheriting from hydra_base config
+
+# hydra behavior configuration
+hydra:
+  run: # project_id/series_id/build_id
+    dir: dana/${backend.name}_${device}/serie.${experiment_name}/${now:%Y%m%d-%H%M%S}
+  sweep: # project_id/series_id/build_id
+    dir: dana/${backend.name}_${device}/serie.${experiment_name}/${now:%Y%m%d-%H%M%S}
+    subdir: "" # to remove the subdir for sweeps (experiment_name and timestamp are enough)
+  job:
+    chdir: true # to change the working directory during the run/sweep directory
